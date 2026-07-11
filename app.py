@@ -82,7 +82,10 @@ fig.update_layout(
     paper_bgcolor="#000000", plot_bgcolor="#000000", font_color="#FFFFFF",
     margin={"r":0,"t":20,"l":0,"b":0},
     legend=dict(x=0.08, y=0.5, bgcolor="rgba(0,0,0,0.6)", bordercolor="#FFFFFF", borderwidth=1.5),
-    geo=dict(showland=True, landcolor="#525252", showocean=True, oceancolor="#0B132B", showlakes=True, lakecolor="#0B132B", bgcolor="#000000")
+    geo=dict(showland=True, landcolor="#525252", showocean=True, oceancolor="#0B132B", showlakes=True, lakecolor="#0B132B", bgcolor="#000000", showcountries=True,      # Habilita as fronteiras dos países
+        countrycolor="#000000",  # Define a cor das fronteiras (preto)
+        showcoastlines=True,     # Garante o contorno da costa
+        coastlinecolor="#000000" # Cor do contorno da costa)
 )
 
 # 5. Header
