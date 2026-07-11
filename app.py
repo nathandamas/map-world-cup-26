@@ -85,7 +85,7 @@ fig.update_layout(
     geo=dict(showland=True, landcolor="#525252", showocean=True, oceancolor="#0B132B", showlakes=True, lakecolor="#0B132B", bgcolor="#000000", showcountries=True,      # Habilita as fronteiras dos países
         countrycolor="#000000",  # Define a cor das fronteiras (preto)
         showcoastlines=True,     # Garante o contorno da costa
-        coastlinecolor="#000000" # Cor do contorno da costa)
+        coastlinecolor="#000000") # Cor do contorno da costa)
 )
 
 # 5. Header
