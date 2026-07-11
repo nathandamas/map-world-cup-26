@@ -46,7 +46,7 @@ if st.sidebar.button("▶ Play Animation"):
 
 # Logic for Animation Loop
 if st.session_state.is_playing:
-    time.sleep(0.5)
+    time.sleep(1.0)
     if st.session_state.stage_index < len(STAGES) - 1:
         st.session_state.stage_index += 1
         st.rerun()
