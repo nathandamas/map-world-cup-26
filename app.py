@@ -25,7 +25,7 @@ country_names = {
 # 2. Dados com "Dummy Points" para forçar a legenda a ficar fixa
 data = []
 for stage in stages:
-    # Adicionamos os 3 pontos "invisíveis" em cada estágio para forçar a legenda
+    # Pontos invisíveis para garantir que a legenda tenha as 3 categorias sempre
     data.extend([
         {"Country_Code": "AAA", "Country": "Active", "Status": "Active", "Stage": stage},
         {"Country_Code": "BBB", "Country": "Eliminated", "Status": "Eliminated", "Stage": stage},
@@ -37,7 +37,7 @@ for stage in stages:
 
 df = pd.DataFrame(data)
 
-# 3. Mapa com Animação Nativa
+# 3. Mapa com o Filtro Nativo (animation_frame)
 fig = px.choropleth(
     df, locations="Country_Code", color="Status", hover_name="Country",
     animation_frame="Stage",
@@ -46,29 +46,33 @@ fig = px.choropleth(
     projection="natural earth"
 )
 
-# 4. Ajustes de Layout (A "Mágica" para legenda e slider)
+# 4. Ajustes: Legenda aproximada do mapa
 fig.update_layout(
     paper_bgcolor="#000000", plot_bgcolor="#000000", font_color="#FFFFFF",
     margin={"r":0,"t":50,"l":0,"b":0},
-    # Posição da legenda: x=0.05 (mais à esquerda), y=0.5 (centro vertical)
-    legend=dict(x=0.02, y=0.5, bgcolor="rgba(0,0,0,0.5)", bordercolor="#333", borderwidth=1),
-    geo=dict(
-        showland=True, landcolor="#525252", 
-        showocean=True, oceancolor="#0B132B", 
-        showlakes=True, lakecolor="#0B132B", bgcolor="#000000"
-    )
+    legend=dict(
+        x=0.08,  # Aproximei do mapa
+        y=0.5, 
+        xanchor="left", 
+        yanchor="middle", 
+        bgcolor="rgba(0,0,0,0.5)", 
+        bordercolor="#333", 
+        borderwidth=1
+    ),
+    geo=dict(showland=True, landcolor="#525252", showocean=True, oceancolor="#0B132B", showlakes=True, lakecolor="#0B132B", bgcolor="#000000")
 )
 
-# 5. Interface Streamlit
+# 5. Interface
 col1, col2 = st.columns([1, 8])
 with col1:
     st.image("https://raw.githubusercontent.com/nathandamas/map-world-cup-26/main/tournaments_fifa-world-cup-2026--white_700x700.football-logos.cc.png", width=80)
 with col2:
     st.title("FIFA World Cup 26™ | WE ARE 26")
 
-# Renderiza o gráfico
 st.plotly_chart(fig, use_container_width=True)
 
-# Lista de times na Sidebar (opcional, mas bom para contexto)
-st.sidebar.title("Active Teams")
-st.sidebar.markdown("Use the map slider below to filter by stage.")
+# 6. Sidebar
+st.sidebar.title("Participating Teams")
+for code in sorted(teams_elimination.keys(), key=lambda k: country_names[k]):
+    iso_code = iso_map.get(code, "xx")
+    st.sidebar.markdown(f"![Flag](https://flagcdn.com/w20/{iso_code}.png) {country_names[code]}")
