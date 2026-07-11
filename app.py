@@ -139,6 +139,17 @@ fig.update_traces(
 )
 
 # Apply layout styling
+# --- Update Traces (Stroke/Border configuration) ---
+fig.update_traces(
+    marker_line_color="#000000",  # Force borders to be black
+    marker_line_width=0.7,        # Increase thickness slightly for visibility
+    hovertemplate="<b>%{hovertext}</b><br>"
+                  "Status: %{customdata[0]}<br>"
+                  "Match: %{customdata[1]}<br>"
+                  "Date: %{customdata[2]}<extra></extra>"
+)
+
+# --- Apply layout styling ---
 fig.update_layout(
     paper_bgcolor="#000000", 
     plot_bgcolor="#000000", 
@@ -158,13 +169,12 @@ fig.update_layout(
         showlakes=True, 
         lakecolor="#0B132B", 
         bgcolor="#000000", 
-        showcountries=True,
-        countrycolor="#000000",
-        showcoastlines=True,
-        coastlinecolor="#000000"
+        showcountries=True,      # Displays country borders
+        countrycolor="#000000",  # Interior borders color
+        showcoastlines=True,     # Displays coastlines
+        coastlinecolor="#000000" # Coastlines color
     )
 )
-
 # --- Header Section ---
 col1, col2 = st.columns([1, 8])
 with col1:
