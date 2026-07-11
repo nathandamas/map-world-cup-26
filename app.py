@@ -11,7 +11,7 @@ if 'stage_index' not in st.session_state:
 if 'is_playing' not in st.session_state:
     st.session_state.is_playing = False
 
-# --- Data Configuration ---
+# --- Constants & Data ---
 STAGES = ["Group Stage", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"]
 DATES = ["27-06-2026", "03-07-2026", "07-07-2026", "11-07-2026", "15-07-2026", "19-07-2026"]
 
@@ -43,7 +43,7 @@ st.sidebar.title("FIFA World Cup 26™")
 
 if st.sidebar.button("▶ Play Animation"):
     st.session_state.is_playing = True
-    st.session_state.stage_index = 0 # Reinicia ao clicar
+    st.session_state.stage_index = 0
 
 # Slider
 st.session_state.stage_index = st.sidebar.select_slider(
@@ -61,17 +61,14 @@ for country_code in sorted(TEAMS_ELIMINATION.keys(), key=lambda k: COUNTRY_NAMES
         iso_code = ISO_MAP.get(country_code, "xx")
         st.sidebar.markdown(f"![Flag](https://flagcdn.com/w20/{iso_code}.png) {COUNTRY_NAMES[country_code]}")
 
-# --- Header & Map (Inside Placeholder for smooth updates) ---
-col1, col2 = st.columns([1, 8])
-with col1:
-    st.image("https://raw.githubusercontent.com/nathandamas/map-world-cup-26/main/tournaments_fifa-world-cup-2026--white_700x700.football-logos.cc.png", width=80)
-with col2:
-    st.title(f"FIFA World Cup 26™ | {STAGES[stage_idx]}")
+# --- Map Data Preparation ---
+# Adicionamos "dummy rows" para garantir que a legenda sempre mostre as 3 opções
+map_data = [
+    {"Country_Code": "AAA", "Country": "Active", "Status": "Active", "Match": "-", "Date": "-"},
+    {"Country_Code": "BBB", "Country": "Eliminated", "Status": "Eliminated", "Match": "-", "Date": "-"},
+    {"Country_Code": "CCC", "Country": "Not Qualified", "Status": "Not Qualified", "Match": "-", "Date": "-"}
+]
 
-map_placeholder = st.empty() # Placeholder para atualizar o gráfico suavemente
-
-# --- Data Preparation ---
-map_data = []
 for country_code, elimination_index in TEAMS_ELIMINATION.items():
     status = "Eliminated" if stage_idx > elimination_index else "Active"
     match_info = MATCH_DETAILS.get(country_code, {}).get("match", "Eliminated by Points") if status == "Eliminated" else "-"
@@ -80,6 +77,7 @@ for country_code, elimination_index in TEAMS_ELIMINATION.items():
 
 df = pd.DataFrame(map_data)
 
+# --- Map ---
 fig = px.choropleth(
     df, locations="Country_Code", color="Status", hover_name="Country",
     color_discrete_map={"Active": "#00FF4D", "Eliminated": "#404040", "Not Qualified": "#525252"},
@@ -87,8 +85,10 @@ fig = px.choropleth(
     hover_data={"Status": True, "Match": True, "Date": True, "Country_Code": False},
     projection="natural earth"
 )
+
 fig.update_traces(marker_line_color="#000000", marker_line_width=0.7, 
                   hovertemplate="<b>%{hovertext}</b><br>Status: %{customdata[0]}<br>Match: %{customdata[1]}<br>Date: %{customdata[2]}<extra></extra>")
+
 fig.update_layout(
     paper_bgcolor="#000000", plot_bgcolor="#000000", font_color="#FFFFFF",
     margin={"r": 0, "t": 20, "l": 0, "b": 0},
@@ -96,13 +96,20 @@ fig.update_layout(
     geo=dict(showland=True, landcolor="#525252", showocean=True, oceancolor="#0B132B", showlakes=True, lakecolor="#0B132B", bgcolor="#000000", showcountries=True, countrycolor="#000000", showcoastlines=True, coastlinecolor="#000000")
 )
 
-map_placeholder.plotly_chart(fig, use_container_width=True)
+col1, col2 = st.columns([1, 8])
+with col1:
+    st.image("https://raw.githubusercontent.com/nathandamas/map-world-cup-26/main/tournaments_fifa-world-cup-2026--white_700x700.football-logos.cc.png", width=80)
+with col2:
+    st.title(f"FIFA World Cup 26™ | {STAGES[stage_idx]}")
 
-# --- Animation Logic (Must be at the end) ---
+st.plotly_chart(fig, use_container_width=True)
+
+# --- Animation Logic ---
 if st.session_state.is_playing:
     if st.session_state.stage_index < len(STAGES) - 1:
-        time.sleep(1.0) # Tempo de animação
+        time.sleep(1.0)
         st.session_state.stage_index += 1
         st.rerun()
     else:
         st.session_state.is_playing = False
+        st.rerun()
