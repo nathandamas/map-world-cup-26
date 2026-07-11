@@ -2,12 +2,13 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 1. Configuração de Página
+# 1. Configuração
 st.set_page_config(page_title="FIFA World Cup 26 Map", layout="wide")
 
 # 2. Dados
-stages = ["Group Stage", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"]
-dates = ["27-06-2026", "03-07-2026", "07-07-2026", "11-07-2026", "15-07-2026", "19-07-2026"]
+stages = ["1. Group Stage<br>27-06-2026", "2. Round of 32<br>03-07-2026", 
+          "3. Round of 16<br>07-07-2026", "4. Quarter-finals<br>11-07-2026", 
+          "5. Semi-finals<br>15-07-2026", "6. Final<br>19-07-2026"]
 
 teams_elimination = {
     "SAU": 0, "QAT": 0, "KOR": 0, "CUW": 0, "HTI": 0, "IRN": 0, "IRQ": 0, "JOR": 0, "NZL": 0, "PAN": 0, "CZE": 0, "TUN": 0, "URY": 0, "UZB": 0, "SRB": 0, "ITA": 0,
@@ -20,38 +21,32 @@ country_names = {
     "SAU": "Saudi Arabia", "QAT": "Qatar", "KOR": "South Korea", "CUW": "Curacao", "HTI": "Haiti", "IRN": "Iran", "IRQ": "Iraq", "JOR": "Jordan", "NZL": "New Zealand", "PAN": "Panama", "CZE": "Czechia", "TUN": "Tunisia", "URY": "Uruguay", "UZB": "Uzbekistan", "SRB": "Serbia", "ITA": "Italy", "ZAF": "South Africa", "DEU": "Germany", "DZA": "Algeria", "AUS": "Australia", "AUT": "Austria", "BIH": "Bosnia and Herzegovina", "CPV": "Cape Verde", "CIV": "Ivory Coast", "HRV": "Croatia", "ECU": "Ecuador", "GHA": "Ghana", "NLD": "Netherlands", "JPN": "Japan", "COD": "DR Congo", "SEN": "Senegal", "SWE": "Sweden", "BRA": "Brazil", "CAN": "Canada", "COL": "Colombia", "EGY": "Egypt", "USA": "United States", "MEX": "Mexico", "PRY": "Paraguay", "PRT": "Portugal", "MAR": "Morocco", "BEL": "Belgium", "FRA": "France", "ESP": "Spain", "NOR": "Norway", "GBR": "England", "ARG": "Argentina", "CHE": "Switzerland"
 }
 
-flags = {
-    "SAU": "🇸🇦", "QAT": "🇶🇦", "KOR": "🇰🇷", "CUW": "🇨🇼", "HTI": "🇭🇹", "IRN": "🇮🇷", "IRQ": "🇮🇶", "JOR": "🇯🇴", "NZL": "🇳🇿", "PAN": "🇵🇦", "CZE": "🇨🇿", "TUN": "🇹🇳", "URY": "🇺🇾", "UZB": "🇺🇿", "SRB": "🇷🇸", "ITA": "🇮🇹", "ZAF": "🇿🇦", "DEU": "🇩🇪", "DZA": "🇩🇿", "AUS": "🇦🇺", "AUT": "🇦🇹", "BIH": "🇧🇦", "CPV": "🇨🇻", "CIV": "🇨🇮", "HRV": "🇭🇷", "ECU": "🇪🇨", "GHA": "🇬🇭", "NLD": "🇳🇱", "JPN": "🇯🇵", "COD": "🇨🇩", "SEN": "🇸🇳", "SWE": "🇸🇪", "BRA": "🇧🇷", "CAN": "🇨🇦", "COL": "🇨🇴", "EGY": "🇪🇬", "USA": "🇺🇸", "MEX": "🇲🇽", "PRY": "🇵🇾", "PRT": "🇵🇹", "MAR": "🇲🇦", "BEL": "🇧🇪", "FRA": "🇫🇷", "ESP": "🇪🇸", "NOR": "🇳🇴", "GBR": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "ARG": "🇦🇷", "CHE": "🇨🇭"
-}
-
-# 3. Sidebar (Lista de Times)
+# 3. Sidebar com Imagens (FlagCDN - Funciona no Windows)
 st.sidebar.title("FIFA World Cup 26™")
-stage_idx = st.sidebar.slider("Select Stage:", 0, 5, 0, format="%s")
-current_stage_name = stages[stage_idx]
+selected_stage_str = st.sidebar.select_slider("Select Stage:", options=stages)
+stage_idx = stages.index(selected_stage_str)
 
-st.sidebar.markdown(f"### Active Teams ({current_stage_name})")
-active_list = []
+st.sidebar.markdown("---")
+st.sidebar.subheader(f"Active Teams ({selected_stage_str.split('<')[0]})")
+
 sorted_codes = sorted(teams_elimination.keys(), key=lambda k: country_names[k])
 for code in sorted_codes:
     if stage_idx <= teams_elimination[code]:
-        active_list.append(f"{flags.get(code, '')} {country_names[code]}")
+        # FlagCDN URL format (usa o código do país em minúsculas)
+        flag_url = f"https://flagcdn.com/w20/{code.lower()[:2]}.png" 
+        st.sidebar.markdown(f"![Flag]({flag_url}) {country_names[code]}")
 
-for team in active_list:
-    st.sidebar.write(team)
-
-# 4. Processamento do DataFrame para o Mapa
-data = []
-for code, elim_index in teams_elimination.items():
-    # Define o status baseado no slider atual
-    status = "Eliminated" if stage_idx > elim_index else "Active"
-    data.append({"Country_Code": code, "Country": country_names.get(code, code), "Status": status})
-
-# Adiciona dummies para forçar a legenda
-data.extend([
+# 4. Dados para o Mapa (Forçando as 3 categorias para a legenda)
+data = [
     {"Country_Code": "AAA", "Country": "Active", "Status": "Active"},
     {"Country_Code": "BBB", "Country": "Eliminated", "Status": "Eliminated"},
     {"Country_Code": "CCC", "Country": "Not Qualified", "Status": "Not Qualified"}
-])
+]
+
+for code, elim_index in teams_elimination.items():
+    status = "Eliminated" if stage_idx > elim_index else "Active"
+    data.append({"Country_Code": code, "Country": country_names.get(code, code), "Status": status})
+
 df = pd.DataFrame(data)
 
 # 5. Criar Mapa
@@ -74,13 +69,5 @@ fig.update_layout(
 )
 
 # Renderizar
-st.title(f"FIFA World Cup 26™ | {current_stage_name}")
+st.title(f"FIFA World Cup 26™")
 st.plotly_chart(fig, use_container_width=True)
-
-# CSS para Bandeiras
-st.markdown("""
-<style>
-    div[data-testid="stSidebar"] { background-color: #111; }
-    text { font-family: "Arial", "Segoe UI Emoji", sans-serif !important; }
-</style>
-""", unsafe_allow_html=True)
