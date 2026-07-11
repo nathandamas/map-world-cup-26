@@ -44,7 +44,7 @@ if st.sidebar.button("▶ Play Animation"):
     for i in range(len(STAGES)):
         st.session_state.stage_index = i
         st.rerun() # Atualiza a tela a cada fase
-        time.sleep(1.5)
+        time.sleep(.5)
 
 # Slider
 st.session_state.stage_index = st.sidebar.select_slider(
