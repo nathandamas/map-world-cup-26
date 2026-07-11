@@ -67,7 +67,7 @@ df = pd.DataFrame(data)
 # 4. Mapa
 fig = px.choropleth(
     df, locations="Country_Code", color="Status", hover_name="Country",
-    color_discrete_map={"Active": "#00FF4D", "Eliminated": "#1A1A1A", "Not Qualified": "#525252"},
+    color_discrete_map={"Active": "#00FF4D", "Eliminated": "#404040", "Not Qualified": "#525252"},
     category_orders={"Status": ["Active", "Eliminated", "Not Qualified"]},
     hover_data={"Status": True, "Match": True, "Date": True, "Country_Code": False},
     projection="natural earth"
@@ -81,7 +81,7 @@ fig.update_traces(
 fig.update_layout(
     paper_bgcolor="#000000", plot_bgcolor="#000000", font_color="#FFFFFF",
     margin={"r":0,"t":20,"l":0,"b":0},
-    legend=dict(x=0.08, y=0.5, bgcolor="rgba(0,0,0,0.5)", bordercolor="#333", borderwidth=1),
+    legend=dict(x=0.08, y=0.5, bgcolor="rgba(0,0,0,0.6)", bordercolor="#FFFFFF", borderwidth=1.5),
     geo=dict(showland=True, landcolor="#525252", showocean=True, oceancolor="#0B132B", showlakes=True, lakecolor="#0B132B", bgcolor="#000000")
 )
 
