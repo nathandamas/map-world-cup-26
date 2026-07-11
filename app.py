@@ -1,13 +1,15 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import time  # Necessário para o player
+import time
 
 st.set_page_config(page_title="FIFA World Cup 26 Map", layout="wide")
 
 # --- Initializing State ---
 if 'stage_index' not in st.session_state:
     st.session_state.stage_index = 0
+if 'is_playing' not in st.session_state:
+    st.session_state.is_playing = False
 
 # --- Constants & Data ---
 STAGES = ["Group Stage", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"]
@@ -39,19 +41,23 @@ MATCH_DETAILS = {
 # --- Sidebar UI ---
 st.sidebar.title("FIFA World Cup 26™")
 
-# Player Button
 if st.sidebar.button("▶ Play Animation"):
-    for i in range(len(STAGES)):
-        st.session_state.stage_index = i
-        st.rerun() # Atualiza a tela a cada fase
-        time.sleep(.5)
+    st.session_state.is_playing = True
+
+# Logic for Animation Loop
+if st.session_state.is_playing:
+    time.sleep(0.5)
+    if st.session_state.stage_index < len(STAGES) - 1:
+        st.session_state.stage_index += 1
+        st.rerun()
+    else:
+        st.session_state.is_playing = False
+        st.rerun()
 
 # Slider
 st.session_state.stage_index = st.sidebar.select_slider(
-    "Select Stage:", 
-    options=range(len(STAGES)), 
-    value=st.session_state.stage_index,
-    format_func=lambda x: STAGES[x]
+    "Select Stage:", options=range(len(STAGES)), 
+    value=st.session_state.stage_index, format_func=lambda x: STAGES[x]
 )
 
 stage_idx = st.session_state.stage_index
