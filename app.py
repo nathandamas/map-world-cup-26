@@ -72,4 +72,4 @@ with col1:
 with col2:
     st.title(f"FIFA World Cup 26™ | {stages[stage_idx]}")
 
-st.plotly_chart(fig, use_container_width=True)c
+st.plotly_chart(fig, use_container_width=True)
